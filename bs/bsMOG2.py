@@ -1,28 +1,29 @@
 import cv2
-import os
-from skimage import morphology
+
 import numpy as np
+from skimage import morphology
 
-kernel = np.ones((2, 2), np.uint8)
 
+class OpencvBS(object):
+    def __init__(self):
+        self.kernel = np.ones((2, 2), np.uint8)
+        self.cap = cv2.VideoCapture('../data/S001C002P006R001A043_rgb.avi')
+        self.fgbg = cv2.createBackgroundSubtractorMOG2(history=2000, varThreshold=60)
+        self.det = []
+        self.count = 0
 
-def run():
-    for video in os.listdir('../data'):
-        if video != 'S001C002P006R001A043_rgb.avi':
-            continue
-        print(video)
-        cap = cv2.VideoCapture('../data/{}'.format(video))
-        fgbg = cv2.createBackgroundSubtractorMOG2(history=2000, varThreshold=60)
+    def run(self):
         cv2.namedWindow('frame')
         cv2.namedWindow('fgmask')
         cv2.moveWindow('fgmask', 960, 0)
-        ret, frame = cap.read()
+        ret, frame = self.cap.read()
         while ret:
+            self.count += 1
             frame = cv2.resize(frame, (960, 540))
 
             kernel = np.ones((2, 2), np.float32) / 4
             smoothed = cv2.filter2D(frame, -1, kernel)
-            fgmask = fgbg.apply(smoothed)
+            fgmask = self.fgbg.apply(smoothed)
 
             # fgmask = fgbg.apply(frame)
 
@@ -41,6 +42,9 @@ def run():
                 top_new = np.min(Y)
                 bott_new = np.max(Y)
 
+                self.det.append([self.count, 1, left_new, top_new, right_new - left_new, bott_new - top_new,
+                                 -1, -1, -1, -1])
+
                 cv2.rectangle(opening, (top_new, left_new), (bott_new, right_new), (255, 0, 255), 2)
                 cv2.rectangle(frame, (top_new, left_new), (bott_new, right_new), (0, 0, 255), 2)
 
@@ -52,11 +56,13 @@ def run():
             if k == 27:
                 break
 
-            ret, frame = cap.read()
+            ret, frame = self.cap.read()
 
-        cap.release()
+        self.cap.release()
         cv2.destroyAllWindows()
 
 
 if __name__ == '__main__':
-    run()
+    bsObj = OpencvBS()
+    bsObj.run()
+    print(bsObj.det)
