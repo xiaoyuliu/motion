@@ -7,7 +7,7 @@ from skimage import morphology
 matplotlib.interactive(True)
 import matplotlib.pyplot as plt
 
-kernel = np.ones((2, 2), np.float32) / 4
+kernel = np.ones((3, 3), np.float32) / 9
 
 for video in os.listdir('../data'):
     if video.endswith('.mp4'):
@@ -46,14 +46,14 @@ for video in os.listdir('../data'):
             bott_new = np.max(Ys)
 
             cv2.rectangle(frame2, (top_new, left_new), (bott_new, right_new), (255, 0, 255), 2)
-            foreground = np.zeros_like(opening)
-            foreground[top_new:bott_new, left_new:right_new] = opening[top_new:bott_new, left_new:right_new]
+            foreground = np.ones_like(opening) * 255
+            foreground[left_new:right_new, top_new:bott_new] = opening[left_new:right_new, top_new:bott_new]
         else:
-            foreground = np.zeros_like(opening)
+            foreground = np.ones_like(opening) * 255
         down_frame2 = cv2.resize(foreground, (0, 0), fx=1.0 / SCALE, fy=1.0 / SCALE)
         next = down_frame2
         if np.max(opening) != np.min(opening):
-            flow = cv2.calcOpticalFlowFarneback(prvs, next, None, 0.5, 3, 15, 3, 5, 1.2, 0)
+            flow = cv2.calcOpticalFlowFarneback(prvs, next, None, 0.5, 3, 1, 3, 5, 1.2, 0)
             dx = flow[..., 0]
             dy = flow[..., 1]
 
@@ -69,8 +69,9 @@ for video in os.listdir('../data'):
             U = dx
             V = -dy
             ax.clear()
-            ax.quiver(X, Y, U, V, np.arctan2(V, U), scale=SCALE*2, linewidth=.0001, width=0.001)
+            ax.quiver(X, Y, U, V, np.arctan2(V, U), scale=SCALE*SCALE, linewidth=.0001, width=0.001)
         ax.imshow(cv2.cvtColor(frame2, cv2.COLOR_BGR2RGB))
+        # ax.imshow(foreground)
         plt.show()
         plt.pause(0.00000001)
         # bgr[np.where(bgr > 0)] = 127
