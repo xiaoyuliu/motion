@@ -9,7 +9,7 @@ class OpencvBS(object):
         self.kernel = np.ones((3, 3), np.float32) / 9
         self.data_path = '../data/'
         self.cap = None
-        self.fgbg = None
+        self.fgbg = cv2.createBackgroundSubtractorMOG2(history=2000, varThreshold=60)
         self.det = []
         self.count = 0
 
@@ -21,7 +21,6 @@ class OpencvBS(object):
             cv2.namedWindow('frame')
             cv2.namedWindow('fgmask')
             cv2.moveWindow('fgmask', 960, 0)
-            self.fgbg = cv2.createBackgroundSubtractorMOG2(history=2000, varThreshold=60)
             ret, frame = self.cap.read()
             while ret:
                 self.count += 1
@@ -62,8 +61,8 @@ class OpencvBS(object):
 
                 ret, frame = self.cap.read()
 
-        self.cap.release()
-        cv2.destroyAllWindows()
+            self.cap.release()
+            cv2.destroyAllWindows()
 
 
 if __name__ == '__main__':

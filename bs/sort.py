@@ -278,9 +278,9 @@ if __name__ == '__main__':
 
         if display:
             ax1 = fig.add_subplot(111, aspect='equal')
-            fn = 'mot_benchmark/%s/%s/img1/%06d.jpg' % (phase, seq, frame)
-            im = io.imread(fn)
-            ax1.imshow(im)
+            # fn = 'mot_benchmark/%s/%s/img1/%06d.jpg' % (phase, seq, frame)
+            # im = io.imread(fn)
+            # ax1.imshow(im)
             plt.title(' Tracked Targets')
 
         start_time = time.time()
