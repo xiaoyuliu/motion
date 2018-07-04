@@ -1,13 +1,13 @@
 import cv2
 import os
-import numpy as np
+
 import matplotlib
-from skimage import morphology
+import numpy as np
 
 matplotlib.interactive(True)
 import matplotlib.pyplot as plt
 
-kernel = np.ones((3, 3), np.float32) / 9
+kernel = np.ones((4, 4), np.float32) / 16
 
 for video in os.listdir('../data'):
     if video.endswith('.mp4'):
@@ -21,8 +21,8 @@ for video in os.listdir('../data'):
     hsv = np.zeros_like(down_frame1)
     hsv[..., 1] = 255
 
-    H, W = down_frame1.shape[:2]
-    fig = plt.figure(figsize=(H, W))
+    IMAGE_H, IMAGE_W = down_frame1.shape[:2]
+    fig = plt.figure(figsize=(IMAGE_W / 10.0, IMAGE_H / 10.0))
     ax = fig.add_subplot(1, 1, 1)
     while ret:
         ret, frame2 = cap.read()
@@ -53,7 +53,7 @@ for video in os.listdir('../data'):
         down_frame2 = cv2.resize(foreground, (0, 0), fx=1.0 / SCALE, fy=1.0 / SCALE)
         next = down_frame2
         if np.max(opening) != np.min(opening):
-            flow = cv2.calcOpticalFlowFarneback(prvs, next, None, 0.5, 3, 1, 3, 5, 1.2, 0)
+            flow = cv2.calcOpticalFlowFarneback(prvs, next, None, 0.5, 3, 15, 3, 5, 1.2, 0)
             dx = flow[..., 0]
             dy = flow[..., 1]
 
@@ -64,12 +64,18 @@ for video in os.listdir('../data'):
 
             new_frame = np.zeros_like(frame1)
 
-            X = range(0, W * SCALE, SCALE)
-            Y = range(0, H * SCALE, SCALE)
-            U = dx
-            V = -dy
+            X = range(0, IMAGE_W * SCALE, SCALE)
+            Y = range(0, IMAGE_H * SCALE, SCALE)
+            l, r = int(left_new / SCALE), int(right_new / SCALE)
+            t, b = int(top_new / SCALE), int(bott_new / SCALE)
+            delta_x = np.zeros_like(dx)
+            delta_y = np.zeros_like(dy)
+            delta_x[l:r, t:b] = dx[l:r, t:b]
+            delta_y[l:r, t:b] = dy[l:r, t:b]
+            U = delta_x
+            V = -delta_y
             ax.clear()
-            ax.quiver(X, Y, U, V, np.arctan2(V, U), scale=SCALE*SCALE, linewidth=.0001, width=0.001)
+            ax.quiver(X, Y, U, V, np.arctan2(V, U), scale=SCALE * SCALE / 2, linewidth=.001, width=0.001)
         ax.imshow(cv2.cvtColor(frame2, cv2.COLOR_BGR2RGB))
         # ax.imshow(foreground)
         plt.show()
