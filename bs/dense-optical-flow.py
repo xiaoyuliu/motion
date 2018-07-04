@@ -34,11 +34,23 @@ for video in os.listdir('../data'):
 
         # fgmask = fgbg.apply(frame)
 
-        ret, fgmask = cv2.threshold(fgmask, 200, 255, cv2.THRESH_TOZERO)
+        ret, fgmask = cv2.threshold(fgmask, 127, 255, cv2.THRESH_TOZERO)
 
         opening = cv2.morphologyEx(fgmask, cv2.MORPH_OPEN, kernel)
+        Xs = np.where(opening > 100)[0]
+        Ys = np.where(opening > 100)[1]
+        if not np.all(Xs == 0) and not np.all(Ys == 0):
+            left_new = np.min(Xs)
+            right_new = np.max(Xs)
+            top_new = np.min(Ys)
+            bott_new = np.max(Ys)
 
-        down_frame2 = cv2.resize(opening, (0, 0), fx=1.0 / SCALE, fy=1.0 / SCALE)
+            cv2.rectangle(frame2, (top_new, left_new), (bott_new, right_new), (255, 0, 255), 2)
+            foreground = np.zeros_like(opening)
+            foreground[top_new:bott_new, left_new:right_new] = opening[top_new:bott_new, left_new:right_new]
+        else:
+            foreground = np.zeros_like(opening)
+        down_frame2 = cv2.resize(foreground, (0, 0), fx=1.0 / SCALE, fy=1.0 / SCALE)
         next = down_frame2
         if np.max(opening) != np.min(opening):
             flow = cv2.calcOpticalFlowFarneback(prvs, next, None, 0.5, 3, 15, 3, 5, 1.2, 0)
