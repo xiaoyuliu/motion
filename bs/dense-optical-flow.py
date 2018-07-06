@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 kernel = np.ones((4, 4), np.float32) / 16
 
 for video in os.listdir('../data'):
-    if video.endswith('.mp4'):
+    if not video.endswith('.avi'):
         continue
     cap = cv2.VideoCapture("../data/{}".format(video))
     fgbg = cv2.createBackgroundSubtractorMOG2(history=2000, varThreshold=60)
@@ -75,14 +75,14 @@ for video in os.listdir('../data'):
             U = delta_x
             V = -delta_y
             ax.clear()
-            ax.quiver(X, Y, U, V, np.arctan2(V, U), scale=SCALE * SCALE / 2, linewidth=.001, width=0.001)
+            ax.quiver(X, Y, U, V, np.arctan2(V, U), scale=SCALE * SCALE, linewidth=.001, width=0.001)
         ax.imshow(cv2.cvtColor(frame2, cv2.COLOR_BGR2RGB))
         # ax.imshow(foreground)
         plt.show()
         plt.pause(0.00000001)
         # bgr[np.where(bgr > 0)] = 127
         # cv2.imshow('frame', frame2)
-        k = cv2.waitKey(1) & 0xff
+        k = cv2.waitKey(0) & 0xff
         if k == 27:
             break
         # elif k == ord('s'):

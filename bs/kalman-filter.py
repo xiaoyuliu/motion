@@ -1,8 +1,9 @@
 import cv2
 import os
-import numpy as np
 
 import matplotlib
+import numpy as np
+
 matplotlib.interactive(True)
 import matplotlib.pyplot as plt
 
@@ -11,7 +12,7 @@ measure_y = []
 predict_y = []
 
 for video in os.listdir('../data/'):
-    if video.endswith('.mp4'):
+    if not video.endswith('.avi'):
         continue
     print(video)
     if len(measure_y) > 0:
@@ -91,7 +92,7 @@ for video in os.listdir('../data/'):
         cv2.imshow('frame', frame)
         # cv2.imshow('smooth', smoothed)
 
-        k = cv2.waitKey(1) & 0xff
+        k = cv2.waitKey(0) & 0xff
         if k == 27:
             break
 
