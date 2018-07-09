@@ -20,7 +20,8 @@ for video in os.listdir('../data/'):
         plt.plot(predict_y, label='predict')
         plt.legend()
         plt.show()
-        plt.clf()
+        # plt.clf()
+
     measure_y = []
     predict_y = []
     cap = cv2.VideoCapture('../data/' + video)

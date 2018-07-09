@@ -53,7 +53,10 @@ for video in os.listdir('../data'):
         down_frame2 = cv2.resize(foreground, (0, 0), fx=1.0 / SCALE, fy=1.0 / SCALE)
         next = down_frame2
         if np.max(opening) != np.min(opening):
+            import time
+            start = time.time()
             flow = cv2.calcOpticalFlowFarneback(prvs, next, None, 0.5, 3, 15, 3, 5, 1.2, 0)
+            # print('time per frame: ', time.time() - start)
             dx = flow[..., 0]
             dy = flow[..., 1]
 
@@ -75,16 +78,18 @@ for video in os.listdir('../data'):
             U = delta_x
             V = -delta_y
             ax.clear()
+            start = time.time()
             ax.quiver(X, Y, U, V, np.arctan2(V, U), scale=SCALE * SCALE, linewidth=.001, width=0.001)
+            print('time per frame: ', time.time() - start)
         ax.imshow(cv2.cvtColor(frame2, cv2.COLOR_BGR2RGB))
         # ax.imshow(foreground)
         plt.show()
         plt.pause(0.00000001)
         # bgr[np.where(bgr > 0)] = 127
         # cv2.imshow('frame', frame2)
-        k = cv2.waitKey(0) & 0xff
-        if k == 27:
-            break
+        # k = cv2.waitKey(0) & 0xff
+        # if k == 27:
+        #     break
         # elif k == ord('s'):
         #     cv2.imwrite('opticalfb.png', frame2)
         prvs = next

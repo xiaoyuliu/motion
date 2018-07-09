@@ -15,7 +15,7 @@ class OpencvBS(object):
 
     def run(self):
         for video in os.listdir(self.data_path):
-            if video.endswith('.mp4'):
+            if not video.endswith('.avi'):
                 continue
             self.cap = cv2.VideoCapture(self.data_path + video)
             cv2.namedWindow('frame')
